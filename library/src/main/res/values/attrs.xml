@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="SwipeProgressView">
+        <attr name="spv_minProgress" format="integer" />
+        <attr name="spv_maxProgress" format="integer" />
+        <attr name="spv_currentProgress" format="integer" />
+    </declare-styleable>
+
+    <attr name="swipeProgressViewStyle" format="reference" />
+</resources>

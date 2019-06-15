@@ -1,46 +1,140 @@
 package me.thanel.swipeprogressview
 
+import android.animation.ObjectAnimator
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.util.AttributeSet
+import android.util.IntProperty
+import android.util.Property
 import android.view.MotionEvent
 import android.view.ViewConfiguration
+import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
 import androidx.annotation.ColorInt
-import me.thanel.swipeprogressview.internal.clamp
+import androidx.core.content.res.use
+import me.thanel.swipeprogressview.internal.clamped
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
 class SwipeProgressView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = R.attr.swipeProgressViewStyle
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     private val touchSlop = ViewConfiguration.get(context).scaledTouchSlop
     private val progressBackground = ColorDrawable(getColor(context))
     private var onProgressChangeListener: ((Int) -> Unit)? = null
-    private var isScrolling = false
+    private var isSwiping = false
     private var initialEventX = 0f
     private var initialEventY = 0f
     private var currentScrollStartValue = 0
 
-    var minValue = 0
+    /**
+     * The lower limit of this progress view's range.
+     *
+     * Setting this property will also update the [currentProgress] value to not be smaller than the
+     * newly set min progress.
+     */
+    var minProgress: Int = 0
+        set(newValue) {
+            if (field == newValue) return
+            field = newValue
+            if (currentProgress < newValue) {
+                currentProgress = newValue
+            }
+        }
 
-    var maxValue = 100
+    /**
+     * The upper limit of this progress view's range.
+     *
+     * Setting this property will also update the [currentProgress] value to not be bigger than the
+     * newly set max progress.
+     */
+    var maxProgress: Int = 100
+        set(newValue) {
+            if (field == newValue) return
+            field = newValue
+            if (currentProgress > newValue) {
+                currentProgress = newValue
+            }
+        }
 
-    var currentValue = 20
-        set(value) {
-            if (field == value) return
-            field = value
-            invalidate()
-            onProgressChangeListener?.invoke(value)
+    /**
+     * The progress view's current level of progress.
+     *
+     * Setting this property will immediately update the visual position of the progress indicator.
+     * To animate the visual position to the target value, use [setCurrentProgressAnimated].
+     *
+     * **Note** When attempting to set this value to any number outside of the [minProgress] and
+     * [maxProgress] range, the value will be automatically set to the closest valid number that
+     * fits within that range.
+     *
+     * @see minProgress
+     * @see maxProgress
+     * @see setCurrentProgressAnimated
+     */
+    var currentProgress: Int = 0
+        set(newValue) {
+            if (field == newValue) return
+            field = when {
+                newValue > maxProgress -> maxProgress
+                newValue < minProgress -> minProgress
+                else -> newValue
+            }
+            visualProgress = field
+            onProgressChangeListener?.invoke(newValue)
         }
 
     init {
         setWillNotDraw(false)
+
+        context.obtainStyledAttributes(attrs, R.styleable.SwipeProgressView).use {
+            minProgress = it.getInt(R.styleable.SwipeProgressView_spv_minProgress, minProgress)
+            maxProgress = it.getInt(R.styleable.SwipeProgressView_spv_maxProgress, maxProgress)
+            currentProgress =
+                it.getInt(R.styleable.SwipeProgressView_spv_currentProgress, currentProgress)
+        }
+    }
+
+    /**
+     * Registers a callback to be invoked when the value of [currentProgress] property is changed.
+     *
+     * @param listener the callback that will be run.
+     */
+    fun setOnProgressChangeListener(listener: ((Int) -> Unit)?) {
+        onProgressChangeListener = listener
+    }
+
+    private var visualProgress: Int = 0
+        set(newValue) {
+            field = newValue
+            invalidate()
+        }
+
+    /**
+     * Sets the current progress to the specified value, animating the visual position between the
+     * current and target values.
+     *
+     * Animation does not affect the result of [currentProgress] property, which will return the
+     * target value immediately after this function is called.
+     *
+     * @param progress the new progress value.
+     */
+    fun setCurrentProgressAnimated(progress: Int) {
+        val initialProgress = visualProgress
+        currentProgress = progress
+        visualProgress = initialProgress
+
+        val animator = ObjectAnimator.ofInt(this, VISUAL_PROGRESS, initialProgress, progress)
+        animator.setAutoCancel(true)
+        animator.duration = ANIMATION_DURATION
+        animator.interpolator = INTERPOLATOR
+        animator.start()
     }
 
     override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
@@ -48,48 +142,51 @@ class SwipeProgressView @JvmOverloads constructor(
             MotionEvent.ACTION_DOWN -> {
                 initialEventX = ev.x
                 initialEventY = ev.y
-                currentScrollStartValue = currentValue
+                currentScrollStartValue = currentProgress
             }
             MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_UP -> {
-                isScrolling = false
+                isSwiping = false
             }
             MotionEvent.ACTION_MOVE -> {
                 val scrolledDistance = ev.x - initialEventX
 
-                if (!isScrolling) {
+                if (!isSwiping) {
                     val verticalScrolledDistance = ev.y - initialEventY
                     if (abs(verticalScrolledDistance) >= touchSlop) {
                         return false
                     }
-                    isScrolling = abs(scrolledDistance) >= touchSlop
+                    isSwiping = abs(scrolledDistance) >= touchSlop
                 }
 
-                return isScrolling
+                return isSwiping
             }
         }
         return false
     }
 
+    @SuppressLint("ClickableViewAccessibility") // performClick is not used
     override fun onTouchEvent(event: MotionEvent): Boolean {
         when (event.actionMasked) {
             MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_UP -> {
-                isScrolling = false
+                isSwiping = false
             }
             MotionEvent.ACTION_MOVE -> {
                 parent?.requestDisallowInterceptTouchEvent(true)
 
                 val scrolledDistance = event.x - initialEventX
-
-                // Convert that distance to represent percentage of the view's width
                 val scrollScale = scrolledDistance / width
-                // Multiply it by some factor to update the value a bit slower
-                val factoredScrollScale = scrollScale * 0.5f
-                // Convert the scale to actual value
-                val scrolledValue = (maxValue * factoredScrollScale).roundToInt()
-                // Add to it the value that was set before scroll started
+
+                // Multiply scroll scale by a factor to make scrolling a bit slower giving the
+                // user more precision during swipes. For example multiplying it by 0.5 will make
+                // single swipe through the whole view update the progress by 50% instead of 100%.
+                val factoredScrollScale = scrollScale * SCROLL_FACTOR
+                val scrolledValue = (maxProgress * factoredScrollScale).roundToInt()
+
+                // Add the initial value to the calculated value so the update always changes as an
+                // offset from the progress value before the swipe started instead of as an offset
+                // from min progress value.
                 val updatedValue = scrolledValue + currentScrollStartValue
-                // Finally clamp the value between min and max and notify the listener with result
-                currentValue = updatedValue.clamp(minValue, maxValue)
+                currentProgress = updatedValue.clamped(minProgress, maxProgress)
 
                 return true
             }
@@ -100,8 +197,9 @@ class SwipeProgressView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        val progressPercent = currentValue / maxValue.toFloat()
-        val end = ((right - left) * progressPercent).roundToInt()
+        val progressPercent =
+            (visualProgress - minProgress) / (maxProgress - minProgress).toFloat()
+        val end = (right * progressPercent).roundToInt()
         progressBackground.setBounds(0, 0, end, bottom - top)
         progressBackground.draw(canvas)
     }
@@ -112,5 +210,28 @@ class SwipeProgressView @JvmOverloads constructor(
         val color = typedArray.getColor(0, Color.BLACK)
         typedArray.recycle()
         return color
+    }
+
+    companion object {
+        private const val SCROLL_FACTOR = 0.5f
+        private const val ANIMATION_DURATION = 80L
+        private val INTERPOLATOR = DecelerateInterpolator()
+        private val VISUAL_PROGRESS = if (Build.VERSION.SDK_INT >= 24) {
+            object : IntProperty<SwipeProgressView>("progress") {
+                override fun setValue(view: SwipeProgressView, value: Int) {
+                    view.visualProgress = value
+                }
+
+                override fun get(view: SwipeProgressView) = view.visualProgress
+            }
+        } else {
+            object : Property<SwipeProgressView, Int>(Int::class.java, "progress") {
+                override fun set(view: SwipeProgressView, value: Int) {
+                    view.visualProgress = value
+                }
+
+                override fun get(view: SwipeProgressView) = view.visualProgress
+            }
+        }
     }
 }

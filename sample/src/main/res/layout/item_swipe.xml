@@ -1,15 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <me.thanel.swipeprogressview.SwipeProgressView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/bookProgressView"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swipeProgressView"
     android:layout_width="match_parent"
-    android:layout_height="120dp">
+    android:layout_height="120dp"
+    app:spv_currentProgress="0"
+    app:spv_maxProgress="200"
+    app:spv_minProgress="-20">
 
     <TextView
-        android:id="@+id/clickableChild"
+        android:id="@+id/progressTextView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="?selectableItemBackground"
         android:gravity="center"
-        android:text="Hello World!" />
+        tools:text="0" />
 
 </me.thanel.swipeprogressview.SwipeProgressView>
