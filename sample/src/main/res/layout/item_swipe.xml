@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<me.thanel.swipeprogressview.SwipeProgressView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/bookProgressView"
+    android:layout_width="match_parent"
+    android:layout_height="120dp">
+
+    <TextView
+        android:id="@+id/clickableChild"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?selectableItemBackground"
+        android:gravity="center"
+        android:text="Hello World!" />
+
+</me.thanel.swipeprogressview.SwipeProgressView>
