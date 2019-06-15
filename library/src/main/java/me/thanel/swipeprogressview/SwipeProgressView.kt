@@ -4,8 +4,8 @@ import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.util.AttributeSet
 import android.util.IntProperty
@@ -14,12 +14,14 @@ import android.view.MotionEvent
 import android.view.ViewConfiguration
 import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
-import androidx.annotation.ColorInt
 import androidx.core.content.res.use
 import me.thanel.swipeprogressview.internal.clamped
+import me.thanel.swipeprogressview.internal.getColorFromAttr
+import me.thanel.swipeprogressview.internal.isLayoutRtl
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
+@SuppressLint("Recycle")
 class SwipeProgressView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -27,18 +29,29 @@ class SwipeProgressView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     private val touchSlop = ViewConfiguration.get(context).scaledTouchSlop
-    private val progressBackground = ColorDrawable(getColor(context))
+    private val isLayoutRtl by lazy { isLayoutRtl() }
+    private val shouldMirrorView get() = mirrorForRtl && isLayoutRtl
     private var onProgressChangeListener: ((Int) -> Unit)? = null
     private var isSwiping = false
     private var initialEventX = 0f
     private var initialEventY = 0f
     private var currentScrollStartValue = 0
+    private var mirrorForRtl = false
+
+    private var visualProgress: Int = 0
+        set(newValue) {
+            field = newValue
+            invalidate()
+        }
 
     /**
      * The lower limit of this progress view's range.
      *
      * Setting this property will also update the [currentProgress] value to not be smaller than the
      * newly set min progress.
+     *
+     * @see currentProgress
+     * @see maxProgress
      */
     var minProgress: Int = 0
         set(newValue) {
@@ -54,6 +67,9 @@ class SwipeProgressView @JvmOverloads constructor(
      *
      * Setting this property will also update the [currentProgress] value to not be bigger than the
      * newly set max progress.
+     *
+     * @see currentProgress
+     * @see minProgress
      */
     var maxProgress: Int = 100
         set(newValue) {
@@ -90,6 +106,11 @@ class SwipeProgressView @JvmOverloads constructor(
             onProgressChangeListener?.invoke(newValue)
         }
 
+    /**
+     * The drawable used to draw the progress indicator.
+     */
+    lateinit var progressDrawable: Drawable
+
     init {
         setWillNotDraw(false)
 
@@ -98,6 +119,11 @@ class SwipeProgressView @JvmOverloads constructor(
             maxProgress = it.getInt(R.styleable.SwipeProgressView_spv_maxProgress, maxProgress)
             currentProgress =
                 it.getInt(R.styleable.SwipeProgressView_spv_currentProgress, currentProgress)
+            val drawable = it.getDrawable(R.styleable.SwipeProgressView_android_progressDrawable)
+            progressDrawable =
+                drawable ?: ColorDrawable(context.getColorFromAttr(R.attr.colorControlActivated))
+            mirrorForRtl =
+                it.getBoolean(R.styleable.SwipeProgressView_android_mirrorForRtl, mirrorForRtl)
         }
     }
 
@@ -105,16 +131,12 @@ class SwipeProgressView @JvmOverloads constructor(
      * Registers a callback to be invoked when the value of [currentProgress] property is changed.
      *
      * @param listener the callback that will be run.
+     *
+     * @see currentProgress
      */
     fun setOnProgressChangeListener(listener: ((Int) -> Unit)?) {
         onProgressChangeListener = listener
     }
-
-    private var visualProgress: Int = 0
-        set(newValue) {
-            field = newValue
-            invalidate()
-        }
 
     /**
      * Sets the current progress to the specified value, animating the visual position between the
@@ -124,6 +146,8 @@ class SwipeProgressView @JvmOverloads constructor(
      * target value immediately after this function is called.
      *
      * @param progress the new progress value.
+     *
+     * @see currentProgress
      */
     fun setCurrentProgressAnimated(progress: Int) {
         val initialProgress = visualProgress
@@ -173,7 +197,11 @@ class SwipeProgressView @JvmOverloads constructor(
             MotionEvent.ACTION_MOVE -> {
                 parent?.requestDisallowInterceptTouchEvent(true)
 
-                val scrolledDistance = event.x - initialEventX
+                val scrolledDistance = if (shouldMirrorView) {
+                    initialEventX - event.x
+                } else {
+                    event.x - initialEventX
+                }
                 val scrollScale = scrolledDistance / width
 
                 // Multiply scroll scale by a factor to make scrolling a bit slower giving the
@@ -199,17 +227,13 @@ class SwipeProgressView @JvmOverloads constructor(
 
         val progressPercent =
             (visualProgress - minProgress) / (maxProgress - minProgress).toFloat()
-        val end = (right * progressPercent).roundToInt()
-        progressBackground.setBounds(0, 0, end, bottom - top)
-        progressBackground.draw(canvas)
-    }
-
-    @ColorInt
-    private fun getColor(context: Context): Int {
-        val typedArray = context.obtainStyledAttributes(intArrayOf(R.attr.colorControlActivated))
-        val color = typedArray.getColor(0, Color.BLACK)
-        typedArray.recycle()
-        return color
+        val progressWidth = (width * progressPercent).roundToInt()
+        if (shouldMirrorView) {
+            progressDrawable.setBounds(width - progressWidth, 0, right, height)
+        } else {
+            progressDrawable.setBounds(0, 0, progressWidth, height)
+        }
+        progressDrawable.draw(canvas)
     }
 
     companion object {
@@ -235,3 +259,4 @@ class SwipeProgressView @JvmOverloads constructor(
         }
     }
 }
+

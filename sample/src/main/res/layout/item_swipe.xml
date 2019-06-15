@@ -5,6 +5,8 @@
     android:id="@+id/swipeProgressView"
     android:layout_width="match_parent"
     android:layout_height="120dp"
+    android:mirrorForRtl="true"
+    android:progressDrawable="?colorPrimary"
     app:spv_currentProgress="0"
     app:spv_maxProgress="200"
     app:spv_minProgress="-20">
