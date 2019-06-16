@@ -211,10 +211,10 @@ class SwipeProgressView @JvmOverloads constructor(
     @SuppressLint("ClickableViewAccessibility") // performClick is not used
     override fun onTouchEvent(event: MotionEvent): Boolean {
         when (event.actionMasked) {
-            MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_UP -> {
+            MotionEvent.ACTION_CANCEL -> {
                 isSwiping = false
             }
-            MotionEvent.ACTION_MOVE -> {
+            MotionEvent.ACTION_MOVE, MotionEvent.ACTION_UP -> {
                 parent?.requestDisallowInterceptTouchEvent(true)
 
                 val scrolledDistance = if (shouldMirrorView) {
@@ -236,10 +236,14 @@ class SwipeProgressView @JvmOverloads constructor(
                 val updatedValue = scrolledValue + currentScrollStartValue
                 progress = updatedValue.clamped(minProgress, maxProgress)
 
+                if (event.actionMasked == MotionEvent.ACTION_UP) {
+                    isSwiping = false
+                }
+
                 return true
             }
         }
-        return super.onTouchEvent(event)
+        return true
     }
 
     override fun onDraw(canvas: Canvas) {

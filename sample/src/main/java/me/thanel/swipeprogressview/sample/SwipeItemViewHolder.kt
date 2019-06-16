@@ -19,7 +19,5 @@ class SwipeItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         swipeProgressView.setOnProgressChangeListener {
             textView.text = it.toString()
         }
-
-        swipeProgressView.
     }
 }
