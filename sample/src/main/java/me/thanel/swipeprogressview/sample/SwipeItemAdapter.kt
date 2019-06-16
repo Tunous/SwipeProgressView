@@ -16,6 +16,6 @@ class SwipeItemAdapter : RecyclerView.Adapter<SwipeItemViewHolder>() {
     override fun onBindViewHolder(holder: SwipeItemViewHolder, position: Int) {
         val progress = position * 20
         holder.textView.text = progress.toString()
-        holder.swipeProgressView.currentProgress = progress
+        holder.swipeProgressView.progress = progress
     }
 }

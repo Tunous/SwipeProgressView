@@ -3,7 +3,7 @@
     <declare-styleable name="SwipeProgressView">
         <attr name="spv_minProgress" format="integer" />
         <attr name="spv_maxProgress" format="integer" />
-        <attr name="spv_currentProgress" format="integer" />
+        <attr name="android:progress" />
         <attr name="android:progressDrawable" />
         <attr name="android:mirrorForRtl" />
     </declare-styleable>

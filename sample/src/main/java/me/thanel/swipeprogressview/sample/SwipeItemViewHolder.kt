@@ -14,7 +14,7 @@ class SwipeItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     init {
         textView.setOnClickListener {
             val randomProgress = swipeProgressView.progressRange.random()
-            swipeProgressView.setCurrentProgressAnimated(randomProgress)
+            swipeProgressView.setProgressAnimated(randomProgress)
         }
         swipeProgressView.setOnProgressChangeListener {
             textView.text = it.toString()
