@@ -208,11 +208,17 @@ class SwipeProgressView @JvmOverloads constructor(
             }
             val scrollScale = scrolledDistance / width
 
-            // Multiply scroll scale by a factor to make scrolling a bit slower giving the
-            // user more precision during swipes. For example multiplying it by 0.5 will make
-            // single swipe through the whole view update the progress by 50% instead of 100%.
-            val factoredScrollScale = scrollScale * SCROLL_FACTOR
             val fullProgress = maxProgress - minProgress
+            val factoredScrollScale = if (fullProgress > 2) {
+                // Multiply scroll scale by a factor to make scrolling a bit slower giving the
+                // user more precision during swipes. For example multiplying it by 0.5 will make
+                // single swipe through the whole view update the progress by 50% instead of 100%.
+                scrollScale * SCROLL_FACTOR
+            } else {
+                // But if the progress range is very small divide scroll scale by a factor instead
+                // to make swiping faster.
+                scrollScale / SCROLL_FACTOR
+            }
             val scrolledValue = (fullProgress * factoredScrollScale).roundToInt()
 
             // Add the initial value to the calculated value so the update always changes as an

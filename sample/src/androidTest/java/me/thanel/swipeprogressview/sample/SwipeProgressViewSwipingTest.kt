@@ -73,4 +73,27 @@ class SwipeProgressViewSwipingTest {
 
         assertThat(rule.activity.swipeProgressView.progress, equalTo(0))
     }
+
+    @Test
+    fun when_range_is_small_swiping_right_through_whole_view_increases_progress_by_100_percent() {
+        rule.activity.swipeProgressView.minProgress = 0
+        rule.activity.swipeProgressView.maxProgress = 2
+
+        onView(withId(R.id.swipeProgressView))
+            .perform(swipe(GeneralLocation.CENTER_LEFT, GeneralLocation.CENTER_RIGHT))
+
+        assertThat(rule.activity.swipeProgressView.progress, equalTo(2))
+    }
+
+    @Test
+    fun when_range_is_small_swiping_leftt_through_whole_view_decreases_progress_by_100_percent() {
+        rule.activity.swipeProgressView.minProgress = 0
+        rule.activity.swipeProgressView.maxProgress = 2
+        rule.activity.swipeProgressView.progress = 2
+
+        onView(withId(R.id.swipeProgressView))
+            .perform(swipe(GeneralLocation.CENTER_RIGHT, GeneralLocation.CENTER_LEFT))
+
+        assertThat(rule.activity.swipeProgressView.progress, equalTo(0))
+    }
 }
