@@ -7,7 +7,10 @@ import kotlinx.android.synthetic.main.item_swipe.view.*
 import me.thanel.swipeprogressview.SwipeProgressView
 import me.thanel.swipeprogressview.progressRange
 
-class SwipeItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+class SwipeItemViewHolder(
+    itemView: View,
+    private val onProgressChange: (Int) -> Unit
+) : RecyclerView.ViewHolder(itemView) {
     val textView: TextView = itemView.progressTextView
     val swipeProgressView: SwipeProgressView = itemView.swipeProgressView
 
@@ -18,6 +21,7 @@ class SwipeItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         }
         swipeProgressView.setOnProgressChangeListener {
             textView.text = it.toString()
+            onProgressChange(it)
         }
     }
 }

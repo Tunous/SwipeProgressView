@@ -6,10 +6,9 @@
     android:layout_width="match_parent"
     android:layout_height="120dp"
     android:mirrorForRtl="true"
-    android:progress="0"
     android:progressDrawable="?colorPrimary"
-    app:spv_maxProgress="200"
-    app:spv_minProgress="-20">
+    app:spv_maxProgress="75"
+    app:spv_minProgress="-25">
 
     <TextView
         android:id="@+id/progressTextView"
