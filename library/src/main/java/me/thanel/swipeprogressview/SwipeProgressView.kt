@@ -235,6 +235,7 @@ class SwipeProgressView @JvmOverloads constructor(
 
         override fun onSingleTapUp(e: MotionEvent): Boolean {
             if (isClickable) {
+                onShowPress(e)
                 performClick()
                 isPressed = false
             }
