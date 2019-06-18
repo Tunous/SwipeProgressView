@@ -212,7 +212,8 @@ class SwipeProgressView @JvmOverloads constructor(
             // user more precision during swipes. For example multiplying it by 0.5 will make
             // single swipe through the whole view update the progress by 50% instead of 100%.
             val factoredScrollScale = scrollScale * SCROLL_FACTOR
-            val scrolledValue = (maxProgress * factoredScrollScale).roundToInt()
+            val fullProgress = maxProgress - minProgress
+            val scrolledValue = (fullProgress * factoredScrollScale).roundToInt()
 
             // Add the initial value to the calculated value so the update always changes as an
             // offset from the progress value before the swipe started instead of as an offset
