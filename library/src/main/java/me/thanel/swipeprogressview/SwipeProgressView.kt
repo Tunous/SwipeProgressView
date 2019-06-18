@@ -10,6 +10,7 @@ import android.os.Build
 import android.util.AttributeSet
 import android.util.IntProperty
 import android.util.Property
+import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
@@ -18,8 +19,6 @@ import androidx.core.content.res.use
 import me.thanel.swipeprogressview.internal.clamped
 import me.thanel.swipeprogressview.internal.getColorFromAttr
 import me.thanel.swipeprogressview.internal.isLayoutRtl
-import me.thanel.swipeprogressview.internal.scaledTouchSlop
-import kotlin.math.abs
 import kotlin.math.roundToInt
 
 @SuppressLint("Recycle")
@@ -29,7 +28,6 @@ class SwipeProgressView @JvmOverloads constructor(
     defStyleAttr: Int = R.attr.swipeProgressViewStyle
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
-    private val touchSlop = context.scaledTouchSlop
     private val isLayoutRtl by lazy { isLayoutRtl() }
     private val shouldMirrorView get() = mirrorForRtl && isLayoutRtl
     private var isSwiping = false
@@ -37,6 +35,7 @@ class SwipeProgressView @JvmOverloads constructor(
     private var initialEventY = 0f
     private var currentScrollStartValue = 0
     private var mirrorForRtl = false
+    private var currentDownEvent: MotionEvent? = null
 
     @VisibleForTesting
     internal var onProgressChangeListener: ((Int) -> Unit)? = null
@@ -181,69 +180,111 @@ class SwipeProgressView @JvmOverloads constructor(
         animator.start()
     }
 
+    private val gestureListener = object : GestureDetector.SimpleOnGestureListener() {
+        override fun onDown(e: MotionEvent): Boolean {
+            currentDownEvent = MotionEvent.obtain(e)
+            isSwiping = false
+            return true
+        }
+
+        override fun onScroll(
+            e1: MotionEvent,
+            e2: MotionEvent,
+            distanceX: Float,
+            distanceY: Float
+        ): Boolean {
+            isPressed = false
+            if (!isSwiping && distanceX != 0f) {
+                isSwiping = true
+            }
+            if (!isSwiping) return false
+
+            parent?.requestDisallowInterceptTouchEvent(true)
+
+            val scrolledDistance = if (shouldMirrorView) {
+                e1.x - e2.x
+            } else {
+                e2.x - e1.x
+            }
+            val scrollScale = scrolledDistance / width
+
+            // Multiply scroll scale by a factor to make scrolling a bit slower giving the
+            // user more precision during swipes. For example multiplying it by 0.5 will make
+            // single swipe through the whole view update the progress by 50% instead of 100%.
+            val factoredScrollScale = scrollScale * SCROLL_FACTOR
+            val scrolledValue = (maxProgress * factoredScrollScale).roundToInt()
+
+            // Add the initial value to the calculated value so the update always changes as an
+            // offset from the progress value before the swipe started instead of as an offset
+            // from min progress value.
+            val updatedValue = scrolledValue + currentScrollStartValue
+            progress = updatedValue.clamped(minProgress, maxProgress)
+
+            return true
+        }
+
+        override fun onLongPress(e: MotionEvent?) {
+            if (isLongClickable) {
+                performLongClick()
+                isPressed = false
+            } else if (isClickable) {
+                performClick()
+                isPressed = false
+            }
+        }
+
+        override fun onSingleTapUp(e: MotionEvent): Boolean {
+            if (isClickable) {
+                performClick()
+                isPressed = false
+            }
+            return true
+        }
+
+        override fun onShowPress(e: MotionEvent) {
+            drawableHotspotChanged(e.x, e.y)
+            isPressed = true
+        }
+    }
+
+    private val gestureDetector = GestureDetector(context, gestureListener).apply {
+        setIsLongpressEnabled(isLongClickable)
+    }
+
+    override fun setLongClickable(longClickable: Boolean) {
+        super.setLongClickable(longClickable)
+        gestureDetector.setIsLongpressEnabled(longClickable)
+    }
+
     override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
+        gestureDetector.onTouchEvent(ev)
         when (ev.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
                 initialEventX = ev.x
                 initialEventY = ev.y
                 currentScrollStartValue = progress
             }
-            MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_UP -> {
-                isSwiping = false
-            }
             MotionEvent.ACTION_MOVE -> {
-                val scrolledDistance = ev.x - initialEventX
-
-                if (!isSwiping) {
-                    val verticalScrolledDistance = ev.y - initialEventY
-                    if (abs(verticalScrolledDistance) >= touchSlop) {
-                        return false
-                    }
-                    isSwiping = abs(scrolledDistance) >= touchSlop
-                }
-
                 return isSwiping
             }
         }
         return false
     }
 
-    @SuppressLint("ClickableViewAccessibility") // performClick is not used
+    @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        when (event.actionMasked) {
-            MotionEvent.ACTION_CANCEL -> {
-                isSwiping = false
-            }
-            MotionEvent.ACTION_MOVE, MotionEvent.ACTION_UP -> {
-                parent?.requestDisallowInterceptTouchEvent(true)
-
-                val scrolledDistance = if (shouldMirrorView) {
-                    initialEventX - event.x
-                } else {
-                    event.x - initialEventX
+        val result = gestureDetector.onTouchEvent(event)
+        if (event.action == MotionEvent.ACTION_UP) {
+            isPressed = false
+            if (isSwiping) {
+                val downEvent = currentDownEvent
+                if (downEvent != null) {
+                    gestureListener.onScroll(downEvent, event, 0f, 0f)
                 }
-                val scrollScale = scrolledDistance / width
-
-                // Multiply scroll scale by a factor to make scrolling a bit slower giving the
-                // user more precision during swipes. For example multiplying it by 0.5 will make
-                // single swipe through the whole view update the progress by 50% instead of 100%.
-                val factoredScrollScale = scrollScale * SCROLL_FACTOR
-                val scrolledValue = (maxProgress * factoredScrollScale).roundToInt()
-
-                // Add the initial value to the calculated value so the update always changes as an
-                // offset from the progress value before the swipe started instead of as an offset
-                // from min progress value.
-                val updatedValue = scrolledValue + currentScrollStartValue
-                progress = updatedValue.clamped(minProgress, maxProgress)
-
-                if (event.actionMasked == MotionEvent.ACTION_UP) {
-                    isSwiping = false
-                }
-
-                return true
             }
+            return true
         }
-        return true
+        return result
     }
 
     override fun onDraw(canvas: Canvas) {

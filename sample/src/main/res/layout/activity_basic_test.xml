@@ -6,4 +6,5 @@
     android:layout_height="match_parent"
     android:progress="50"
     app:spv_maxProgress="100"
+    android:background="?selectableItemBackground"
     app:spv_minProgress="0" />
