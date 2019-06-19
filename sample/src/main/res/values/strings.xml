@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Sample</string>
+    <string name="action_click_me">Click me</string>
 </resources>

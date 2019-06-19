@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<me.thanel.swipeprogressview.SwipeProgressView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swipeProgressView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ContainerTestActivity">
+
+    <Button
+        android:id="@+id/childButton"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="24dp"
+        android:text="@string/action_click_me" />
+
+</me.thanel.swipeprogressview.SwipeProgressView>
