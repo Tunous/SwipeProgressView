@@ -18,7 +18,7 @@ import org.junit.runner.RunWith
 class SwipeProgressViewClickingTest {
 
     @get:Rule
-    val rule = ActivityTestRule<BasicTestActivity>(BasicTestActivity::class.java)
+    val rule = ActivityTestRule(BasicTestActivity::class.java)
 
     @Test
     fun clicking_on_swipe_progress_view_invokes_click_listener() {

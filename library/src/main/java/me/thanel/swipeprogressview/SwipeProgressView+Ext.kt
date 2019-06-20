@@ -12,6 +12,6 @@ package me.thanel.swipeprogressview
 var SwipeProgressView.progressRange: IntRange
     get() = minProgress..maxProgress
     set(newValue) {
-        minProgress = newValue.start
-        maxProgress = newValue.endInclusive
+        minProgress = newValue.first
+        maxProgress = newValue.last
     }

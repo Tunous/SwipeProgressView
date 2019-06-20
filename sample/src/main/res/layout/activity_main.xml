@@ -10,12 +10,12 @@
         android:id="@+id/basicButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Basic" />
+        android:text="@string/screen_basic" />
 
     <Button
         android:id="@+id/recyclerViewButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Recycler View" />
+        android:text="@string/screen_recycler_view" />
 
 </LinearLayout>

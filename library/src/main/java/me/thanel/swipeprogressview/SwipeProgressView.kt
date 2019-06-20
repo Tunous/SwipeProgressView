@@ -27,7 +27,7 @@ import kotlin.math.roundToInt
  *
  * You can update the percentage of progress displayed by using the [progress] property. By default,
  * the progress bar is full when the progress value reaches 100. You can adjust this default by
- * setting the `app:spv_maxProgress` attribute. You can also adjust the miniumum value by setting
+ * setting the `app:spv_maxProgress` attribute. You can also adjust the minimum value by setting
  * the `app:spv_minProgress` attribute.
  *
  * ## Samples

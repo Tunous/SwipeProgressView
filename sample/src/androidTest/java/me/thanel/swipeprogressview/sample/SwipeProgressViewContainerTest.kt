@@ -18,7 +18,7 @@ import org.junit.runner.RunWith
 class SwipeProgressViewContainerTest {
 
     @get:Rule
-    val rule = ActivityTestRule<ContainerTestActivity>(ContainerTestActivity::class.java)
+    val rule = ActivityTestRule(ContainerTestActivity::class.java)
 
     @Test
     fun can_click_on_child_view() {

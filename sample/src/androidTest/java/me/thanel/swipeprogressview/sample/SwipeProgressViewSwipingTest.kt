@@ -16,7 +16,7 @@ import org.junit.runner.RunWith
 class SwipeProgressViewSwipingTest {
 
     @get:Rule
-    val rule = ActivityTestRule<BasicTestActivity>(BasicTestActivity::class.java)
+    val rule = ActivityTestRule(BasicTestActivity::class.java)
 
     @Test
     fun swiping_right_through_whole_view_increases_progress_by_50_percent() {
@@ -86,7 +86,7 @@ class SwipeProgressViewSwipingTest {
     }
 
     @Test
-    fun when_range_is_small_swiping_leftt_through_whole_view_decreases_progress_by_100_percent() {
+    fun when_range_is_small_swiping_left_through_whole_view_decreases_progress_by_100_percent() {
         rule.activity.swipeProgressView.minProgress = 0
         rule.activity.swipeProgressView.maxProgress = 2
         rule.activity.swipeProgressView.progress = 2

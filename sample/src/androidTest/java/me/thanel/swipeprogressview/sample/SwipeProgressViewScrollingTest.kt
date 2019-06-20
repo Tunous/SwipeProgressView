@@ -16,7 +16,7 @@ import org.junit.runner.RunWith
 class SwipeProgressViewScrollingTest {
 
     @get:Rule
-    val rule = ActivityTestRule<RecyclerViewTestActivity>(RecyclerViewTestActivity::class.java)
+    val rule = ActivityTestRule(RecyclerViewTestActivity::class.java)
 
     @Test
     fun can_scroll_on_first_swipe_progress_view_in_recycler_view() {
