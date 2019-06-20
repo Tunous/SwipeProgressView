@@ -1,0 +1,155 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>SwipeProgressView - swipeprogressview</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">swipeprogressview</a>&nbsp;/&nbsp;<a href="../index.html">me.thanel.swipeprogressview</a>&nbsp;/&nbsp;<a href="./index.html">SwipeProgressView</a><br/>
+<br/>
+<h1>SwipeProgressView</h1>
+<code><span class="keyword">class </span><span class="identifier">SwipeProgressView</span>&nbsp;<span class="symbol">:</span>&nbsp;<a href="https://developer.android.com/reference/android/widget/FrameLayout.html"><span class="identifier">FrameLayout</span></a></code> <a href="https://github.com/Tunous/SwipeProgressView/tree/master/library/src/main/java/me/thanel/swipeprogressview/SwipeProgressView.kt#L71">(source)</a>
+<p>An interactive user interface element that indicates generic progress. The user can touch the
+view and swipe left or right to set the current progress level.</p>
+<p>A <code>SwipeProgressView</code> can also act as a container view in which you can place other interactive
+or non interactive elements. Swipe actions will be available when swiping anywhere within this
+view as long as child views (such as <a href="https://developer.android.com/reference/android/widget/SeekBar.html">SeekBar</a>) won't also attempt to listen to swipe gestures.</p>
+<p>You can update the percentage of progress displayed by using the <a href="progress.html">progress</a> property. By default,
+the progress bar is full when the progress value reaches 100. You can adjust this default by
+setting the <code>app:spv_maxProgress</code> attribute. You can also adjust the miniumum value by setting
+the <code>app:spv_minProgress</code> attribute.</p>
+<h2>Samples</h2>
+<p>Progress view with range from 25 to 200 and a default value of 50:</p>
+<pre><code class="lang-xml">&lt;me.thanel.swipeprogressview.SwipeProgressView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:progress="50"
+    app:spv_maxProgress="200"
+    app:spv_minProgress="25" /&gt;
+</code></pre>
+<p>Progress view that displays progress using solid black color:</p>
+<pre><code class="lang-xml">&lt;me.thanel.swipeprogressview.SwipeProgressView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:progressDrawable="@android:color/black" /&gt;
+</code></pre>
+<h3>Attributes</h3>
+<p><code>app:spv_minProgress</code> - the lower limit of this progress view's range. Defaults to <code>0</code>.</p>
+<p><code>app:spv_maxProgress</code> - the upper limit of this progress view's range. Defaults to <code>100</code>.</p>
+<p><code>android:progress</code> - the progress view's current level of progress. Defaults to the same value
+as <code>app:spv_minProgress</code>.</p>
+<p><code>android:progressDrawable</code> - the drawable used to draw the progress indicator. Defaults to
+<a href="https://developer.android.com/reference/android/graphics/drawable/ColorDrawable.html">ColorDrawable</a> with color set from <code>colorControlActivated</code> style attribute.</p>
+<p><code>android:mirrorForRtl</code> - defines if the progress drawable and swipe direction need to be
+mirrored when in RTL mode. Defaults to <code>false</code>.</p>
+<h3>Constructors</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="-init-.html">&lt;init&gt;</a></p>
+</td>
+<td>
+<code><span class="identifier">SwipeProgressView</span><span class="symbol">(</span><span class="identifier" id="me.thanel.swipeprogressview.SwipeProgressView$<init>(android.content.Context, android.util.AttributeSet, kotlin.Int)/context">context</span><span class="symbol">:</span>&nbsp;<a href="https://developer.android.com/reference/android/content/Context.html"><span class="identifier">Context</span></a><span class="symbol">, </span><span class="identifier" id="me.thanel.swipeprogressview.SwipeProgressView$<init>(android.content.Context, android.util.AttributeSet, kotlin.Int)/attrs">attrs</span><span class="symbol">:</span>&nbsp;<a href="https://developer.android.com/reference/android/util/AttributeSet.html"><span class="identifier">AttributeSet</span></a><span class="symbol">?</span>&nbsp;<span class="symbol">=</span>&nbsp;null<span class="symbol">, </span><span class="identifier" id="me.thanel.swipeprogressview.SwipeProgressView$<init>(android.content.Context, android.util.AttributeSet, kotlin.Int)/defStyleAttr">defStyleAttr</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a>&nbsp;<span class="symbol">=</span>&nbsp;R.attr.swipeProgressViewStyle<span class="symbol">)</span></code>
+<p>An interactive user interface element that indicates generic progress. The user can touch the
+view and swipe left or right to set the current progress level.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Properties</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="max-progress.html">maxProgress</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">maxProgress</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a></code>
+<p>The upper limit of this progress view's range.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="min-progress.html">minProgress</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">minProgress</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a></code>
+<p>The lower limit of this progress view's range.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="mirror-for-rtl.html">mirrorForRtl</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">mirrorForRtl</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html"><span class="identifier">Boolean</span></a></code>
+<p>Defines if the progress drawable and swipe direction need to be mirrored when in RTL mode.
+Defaults to <code>false</code>.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="progress.html">progress</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">progress</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a></code>
+<p>The progress view's current level of progress.</p>
+</td>
+</tr>
+<tr>
+<td>
+<p><a href="progress-drawable.html">progressDrawable</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><span class="identifier">progressDrawable</span><span class="symbol">: </span><a href="https://developer.android.com/reference/android/graphics/drawable/Drawable.html"><span class="identifier">Drawable</span></a></code>
+<p>The drawable used to draw the progress indicator.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="set-on-progress-change-listener.html">setOnProgressChangeListener</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><span class="identifier">setOnProgressChangeListener</span><span class="symbol">(</span><span class="identifier" id="me.thanel.swipeprogressview.SwipeProgressView$setOnProgressChangeListener(kotlin.Function1((kotlin.Int, kotlin.Unit)))/listener">listener</span><span class="symbol">:</span>&nbsp;<span class="symbol">(</span><span class="symbol">(</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a><span class="symbol">)</span>&nbsp;<span class="symbol">-&gt;</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a><span class="symbol">)</span><span class="symbol">?</span><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Registers a callback to be invoked when the value of <a href="progress.html">progress</a> property is changed.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Extension Properties</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="../progress-range.html">progressRange</a></p>
+</td>
+<td>
+<code><span class="keyword">var </span><a href="./index.html"><span class="identifier">SwipeProgressView</span></a><span class="symbol">.</span><span class="identifier">progressRange</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.ranges/-int-range/index.html"><span class="identifier">IntRange</span></a></code>
+<p>The minimum-maximum progress range of this view.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3>Extension Functions</h3>
+<table>
+<tbody>
+<tr>
+<td>
+<p><a href="../set-progress-animated.html">setProgressAnimated</a></p>
+</td>
+<td>
+<code><span class="keyword">fun </span><a href="./index.html"><span class="identifier">SwipeProgressView</span></a><span class="symbol">.</span><span class="identifier">setProgressAnimated</span><span class="symbol">(</span><span class="identifier" id="me.thanel.swipeprogressview$setProgressAnimated(me.thanel.swipeprogressview.SwipeProgressView, kotlin.Int)/progress">progress</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a><span class="symbol">)</span><span class="symbol">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html"><span class="identifier">Unit</span></a></code>
+<p>Sets the current progress to the specified value, animating the visual position between the
+current and target values.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</BODY>
+</HTML>

@@ -1,0 +1,47 @@
+<HTML>
+<HEAD>
+<meta charset="UTF-8">
+<title>SwipeProgressView.<init> - swipeprogressview</title>
+<link rel="stylesheet" href="../../../style.css">
+</HEAD>
+<BODY>
+<a href="../../index.html">swipeprogressview</a>&nbsp;/&nbsp;<a href="../index.html">me.thanel.swipeprogressview</a>&nbsp;/&nbsp;<a href="index.html">SwipeProgressView</a>&nbsp;/&nbsp;<a href="./-init-.html">&lt;init&gt;</a><br/>
+<br/>
+<h1>&lt;init&gt;</h1>
+<a name="me.thanel.swipeprogressview.SwipeProgressView$&lt;init&gt;(android.content.Context, android.util.AttributeSet, kotlin.Int)"></a>
+<code><span class="identifier">SwipeProgressView</span><span class="symbol">(</span><span class="identifier" id="me.thanel.swipeprogressview.SwipeProgressView$<init>(android.content.Context, android.util.AttributeSet, kotlin.Int)/context">context</span><span class="symbol">:</span>&nbsp;<a href="https://developer.android.com/reference/android/content/Context.html"><span class="identifier">Context</span></a><span class="symbol">, </span><span class="identifier" id="me.thanel.swipeprogressview.SwipeProgressView$<init>(android.content.Context, android.util.AttributeSet, kotlin.Int)/attrs">attrs</span><span class="symbol">:</span>&nbsp;<a href="https://developer.android.com/reference/android/util/AttributeSet.html"><span class="identifier">AttributeSet</span></a><span class="symbol">?</span>&nbsp;<span class="symbol">=</span>&nbsp;null<span class="symbol">, </span><span class="identifier" id="me.thanel.swipeprogressview.SwipeProgressView$<init>(android.content.Context, android.util.AttributeSet, kotlin.Int)/defStyleAttr">defStyleAttr</span><span class="symbol">:</span>&nbsp;<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html"><span class="identifier">Int</span></a>&nbsp;<span class="symbol">=</span>&nbsp;R.attr.swipeProgressViewStyle<span class="symbol">)</span></code>
+<p>An interactive user interface element that indicates generic progress. The user can touch the
+view and swipe left or right to set the current progress level.</p>
+<p>A <code>SwipeProgressView</code> can also act as a container view in which you can place other interactive
+or non interactive elements. Swipe actions will be available when swiping anywhere within this
+view as long as child views (such as <a href="https://developer.android.com/reference/android/widget/SeekBar.html">SeekBar</a>) won't also attempt to listen to swipe gestures.</p>
+<p>You can update the percentage of progress displayed by using the <a href="progress.html">progress</a> property. By default,
+the progress bar is full when the progress value reaches 100. You can adjust this default by
+setting the <code>app:spv_maxProgress</code> attribute. You can also adjust the miniumum value by setting
+the <code>app:spv_minProgress</code> attribute.</p>
+<h2>Samples</h2>
+<p>Progress view with range from 25 to 200 and a default value of 50:</p>
+<pre><code class="lang-xml">&lt;me.thanel.swipeprogressview.SwipeProgressView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:progress="50"
+    app:spv_maxProgress="200"
+    app:spv_minProgress="25" /&gt;
+</code></pre>
+<p>Progress view that displays progress using solid black color:</p>
+<pre><code class="lang-xml">&lt;me.thanel.swipeprogressview.SwipeProgressView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:progressDrawable="@android:color/black" /&gt;
+</code></pre>
+<h3>Attributes</h3>
+<p><code>app:spv_minProgress</code> - the lower limit of this progress view's range. Defaults to <code>0</code>.</p>
+<p><code>app:spv_maxProgress</code> - the upper limit of this progress view's range. Defaults to <code>100</code>.</p>
+<p><code>android:progress</code> - the progress view's current level of progress. Defaults to the same value
+as <code>app:spv_minProgress</code>.</p>
+<p><code>android:progressDrawable</code> - the drawable used to draw the progress indicator. Defaults to
+<a href="https://developer.android.com/reference/android/graphics/drawable/ColorDrawable.html">ColorDrawable</a> with color set from <code>colorControlActivated</code> style attribute.</p>
+<p><code>android:mirrorForRtl</code> - defines if the progress drawable and swipe direction need to be
+mirrored when in RTL mode. Defaults to <code>false</code>.</p>
+</BODY>
+</HTML>

@@ -1,6 +1,7 @@
 apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'org.jetbrains.dokka-android'
 
 android {
     compileSdkVersion 28
@@ -26,6 +27,18 @@ android {
         unitTests {
             includeAndroidResources = true
         }
+    }
+}
+
+dokka {
+    moduleName = "swipeprogressview"
+    outputDirectory = "$rootDir/docs"
+    reportUndocumented = true
+
+    linkMapping {
+        dir = "src/main/java"
+        url = "https://github.com/Tunous/SwipeProgressView/tree/master/library/src/main/java"
+        suffix = "#L"
     }
 }
 

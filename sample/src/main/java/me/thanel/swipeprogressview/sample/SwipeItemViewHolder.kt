@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_swipe.view.*
 import me.thanel.swipeprogressview.SwipeProgressView
 import me.thanel.swipeprogressview.progressRange
+import me.thanel.swipeprogressview.setProgressAnimated
 
 class SwipeItemViewHolder(
     itemView: View,

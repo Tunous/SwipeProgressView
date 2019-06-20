@@ -1,7 +1,13 @@
 package me.thanel.swipeprogressview
 
 /**
- * TODO: Documentation
+ * The minimum-maximum progress range of this view.
+ *
+ * Setting this property will modify both the [minProgress][SwipeProgressView.minProgress] and
+ * [maxProgress][SwipeProgressView.maxProgress] properties.
+ *
+ * @see SwipeProgressView.minProgress
+ * @see SwipeProgressView.maxProgress
  */
 var SwipeProgressView.progressRange: IntRange
     get() = minProgress..maxProgress

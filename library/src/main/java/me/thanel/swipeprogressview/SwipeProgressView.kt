@@ -1,19 +1,15 @@
 package me.thanel.swipeprogressview
 
-import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
-import android.os.Build
 import android.util.AttributeSet
-import android.util.IntProperty
-import android.util.Property
 import android.view.GestureDetector
 import android.view.MotionEvent
-import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
+import android.widget.SeekBar
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.res.use
 import me.thanel.swipeprogressview.internal.clamped
@@ -21,6 +17,56 @@ import me.thanel.swipeprogressview.internal.getColorFromAttr
 import me.thanel.swipeprogressview.internal.isLayoutRtl
 import kotlin.math.roundToInt
 
+/**
+ * An interactive user interface element that indicates generic progress. The user can touch the
+ * view and swipe left or right to set the current progress level.
+ *
+ * A `SwipeProgressView` can also act as a container view in which you can place other interactive
+ * or non interactive elements. Swipe actions will be available when swiping anywhere within this
+ * view as long as child views (such as [SeekBar]) won't also attempt to listen to swipe gestures.
+ *
+ * You can update the percentage of progress displayed by using the [progress] property. By default,
+ * the progress bar is full when the progress value reaches 100. You can adjust this default by
+ * setting the `app:spv_maxProgress` attribute. You can also adjust the miniumum value by setting
+ * the `app:spv_minProgress` attribute.
+ *
+ * ## Samples
+ *
+ * Progress view with range from 25 to 200 and a default value of 50:
+ *
+ * ```xml
+ * <me.thanel.swipeprogressview.SwipeProgressView
+ *     android:layout_width="match_parent"
+ *     android:layout_height="match_parent"
+ *     android:progress="50"
+ *     app:spv_maxProgress="200"
+ *     app:spv_minProgress="25" />
+ * ```
+ *
+ * Progress view that displays progress using solid black color:
+ *
+ * ```xml
+ * <me.thanel.swipeprogressview.SwipeProgressView
+ *     android:layout_width="match_parent"
+ *     android:layout_height="match_parent"
+ *     android:progressDrawable="@android:color/black" />
+ * ```
+ *
+ * ### Attributes
+ *
+ * `app:spv_minProgress` - the lower limit of this progress view's range. Defaults to `0`.
+ *
+ * `app:spv_maxProgress` - the upper limit of this progress view's range. Defaults to `100`.
+ *
+ * `android:progress` - the progress view's current level of progress. Defaults to the same value
+ * as `app:spv_minProgress`.
+ *
+ * `android:progressDrawable` - the drawable used to draw the progress indicator. Defaults to
+ * [ColorDrawable] with color set from `colorControlActivated` style attribute.
+ *
+ * `android:mirrorForRtl` - defines if the progress drawable and swipe direction need to be
+ * mirrored when in RTL mode. Defaults to `false`.
+ */
 @SuppressLint("Recycle")
 class SwipeProgressView @JvmOverloads constructor(
     context: Context,
@@ -34,37 +80,18 @@ class SwipeProgressView @JvmOverloads constructor(
     private var initialEventX = 0f
     private var initialEventY = 0f
     private var currentScrollStartValue = 0
-    private var mirrorForRtl = false
     private var currentDownEvent: MotionEvent? = null
+    private val defaultDrawable by lazy {
+        ColorDrawable(context.getColorFromAttr(R.attr.colorControlActivated))
+    }
 
     @VisibleForTesting
     internal var onProgressChangeListener: ((Int) -> Unit)? = null
 
-    private var visualProgress: Int = 0
+    internal var visualProgress: Int = 0
         set(newValue) {
             field = newValue
             invalidate()
-        }
-
-    /**
-     * The lower limit of this progress view's range.
-     *
-     * Setting this property will also update the [progress] and [maxProgress] values to not be
-     * smaller than the newly set min progress.
-     *
-     * @see progress
-     * @see maxProgress
-     */
-    var minProgress: Int = 0
-        set(newValue) {
-            if (field == newValue) return
-            field = newValue
-            if (progress < newValue) {
-                progress = newValue
-            }
-            if (maxProgress < newValue) {
-                maxProgress = newValue
-            }
         }
 
     /**
@@ -72,6 +99,8 @@ class SwipeProgressView @JvmOverloads constructor(
      *
      * Setting this property will also update the [progress] and [minProgress] values to not be
      * bigger than the newly set max progress.
+     *
+     * Can also be specified using `app:spv_maxProgress` attribute.
      *
      * @see progress
      * @see minProgress
@@ -89,14 +118,39 @@ class SwipeProgressView @JvmOverloads constructor(
         }
 
     /**
+     * The lower limit of this progress view's range.
+     *
+     * Setting this property will also update the [progress] and [maxProgress] values to not be
+     * smaller than the newly set min progress.
+     *
+     * Can also be specified using `app:spv_minProgress` attribute.
+     *
+     * @see progress
+     * @see maxProgress
+     */
+    var minProgress: Int = 0
+        set(newValue) {
+            if (field == newValue) return
+            field = newValue
+            if (progress < newValue) {
+                progress = newValue
+            }
+            if (maxProgress < newValue) {
+                maxProgress = newValue
+            }
+        }
+
+    /**
      * The progress view's current level of progress.
      *
      * Setting this property will immediately update the visual position of the progress indicator.
      * To animate the visual position to the target value, use [setProgressAnimated].
      *
-     * **Note** When attempting to set this value to any number outside of the [minProgress] and
+     * **Note:** When attempting to set this value to any number outside of the [minProgress] and
      * [maxProgress] range, the value will be automatically set to the closest valid number that
      * fits within that range.
+     *
+     * Can also be specified using `android:progress` attribute.
      *
      * @see minProgress
      * @see maxProgress
@@ -115,9 +169,29 @@ class SwipeProgressView @JvmOverloads constructor(
         }
 
     /**
-     * The drawable used to draw the progress indicator.
+     * Defines if the progress drawable and swipe direction need to be mirrored when in RTL mode.
+     * Defaults to `false`.
+     *
+     * Can also be specified using `android:mirrorForRtl` attribute.
      */
-    lateinit var progressDrawable: Drawable
+    var mirrorForRtl = false
+        set(newValue) {
+            field = newValue
+            invalidate()
+        }
+
+    /**
+     * The drawable used to draw the progress indicator.
+     *
+     * Defaults to [ColorDrawable] with color read from `colorControlActivated` style attribute.
+     *
+     * Can also be specified using `android:progressDrawable` attribute.
+     */
+    var progressDrawable: Drawable = defaultDrawable
+        set(newValue) {
+            field = newValue
+            invalidate()
+        }
 
     init {
         setWillNotDraw(false)
@@ -139,8 +213,8 @@ class SwipeProgressView @JvmOverloads constructor(
             this.progress = progress
 
             val drawable = it.getDrawable(R.styleable.SwipeProgressView_android_progressDrawable)
-            progressDrawable =
-                drawable ?: ColorDrawable(context.getColorFromAttr(R.attr.colorControlActivated))
+            progressDrawable = drawable ?: defaultDrawable
+
             mirrorForRtl =
                 it.getBoolean(R.styleable.SwipeProgressView_android_mirrorForRtl, mirrorForRtl)
         }
@@ -149,35 +223,12 @@ class SwipeProgressView @JvmOverloads constructor(
     /**
      * Registers a callback to be invoked when the value of [progress] property is changed.
      *
-     * @param listener the callback that will be run.
+     * @param listener the callback that will be run. Can be set to `null` to remove the listener.
      *
      * @see progress
      */
     fun setOnProgressChangeListener(listener: ((Int) -> Unit)?) {
         onProgressChangeListener = listener
-    }
-
-    /**
-     * Sets the current progress to the specified value, animating the visual position between the
-     * current and target values.
-     *
-     * Animation does not affect the result of [progress] property, which will return the target
-     * value immediately after this function is called.
-     *
-     * @param progress the new progress value.
-     *
-     * @see progress
-     */
-    fun setProgressAnimated(progress: Int) {
-        val initialProgress = visualProgress
-        this.progress = progress
-        visualProgress = initialProgress
-
-        val animator = ObjectAnimator.ofInt(this, VISUAL_PROGRESS, initialProgress, progress)
-        animator.setAutoCancel(true)
-        animator.duration = ANIMATION_DURATION
-        animator.interpolator = INTERPOLATOR
-        animator.start()
     }
 
     private val gestureListener = object : GestureDetector.SimpleOnGestureListener() {
@@ -259,11 +310,17 @@ class SwipeProgressView @JvmOverloads constructor(
         setIsLongpressEnabled(isLongClickable)
     }
 
+    /**
+     * @suppress
+     */
     override fun setLongClickable(longClickable: Boolean) {
         super.setLongClickable(longClickable)
         gestureDetector.setIsLongpressEnabled(longClickable)
     }
 
+    /**
+     * @suppress
+     */
     override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
         gestureDetector.onTouchEvent(ev)
         when (ev.actionMasked) {
@@ -279,6 +336,9 @@ class SwipeProgressView @JvmOverloads constructor(
         return false
     }
 
+    /**
+     * @suppress
+     */
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
         val result = gestureDetector.onTouchEvent(event)
@@ -295,6 +355,9 @@ class SwipeProgressView @JvmOverloads constructor(
         return result
     }
 
+    /**
+     * @suppress
+     */
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
@@ -311,28 +374,6 @@ class SwipeProgressView @JvmOverloads constructor(
 
     companion object {
         private const val SCROLL_FACTOR = 0.5f
-        private const val ANIMATION_DURATION = 80L
-
-        private val INTERPOLATOR by lazy { DecelerateInterpolator() }
-        private val VISUAL_PROGRESS by lazy {
-            if (Build.VERSION.SDK_INT >= 24) {
-                object : IntProperty<SwipeProgressView>("progress") {
-                    override fun setValue(view: SwipeProgressView, value: Int) {
-                        view.visualProgress = value
-                    }
-
-                    override fun get(view: SwipeProgressView) = view.visualProgress
-                }
-            } else {
-                object : Property<SwipeProgressView, Int>(Int::class.java, "progress") {
-                    override fun set(view: SwipeProgressView, value: Int) {
-                        view.visualProgress = value
-                    }
-
-                    override fun get(view: SwipeProgressView) = view.visualProgress
-                }
-            }
-        }
     }
 }
 
