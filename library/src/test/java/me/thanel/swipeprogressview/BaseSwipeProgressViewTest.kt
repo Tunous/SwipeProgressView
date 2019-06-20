@@ -42,4 +42,6 @@ abstract class BaseSwipeProgressViewTest {
 
         return SwipeProgressView(context)
     }
+
+    protected fun buildSpyView() = spy(buildView())
 }

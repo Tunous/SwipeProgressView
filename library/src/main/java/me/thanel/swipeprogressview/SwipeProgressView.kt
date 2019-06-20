@@ -90,6 +90,7 @@ class SwipeProgressView @JvmOverloads constructor(
 
     internal var visualProgress: Int = 0
         set(newValue) {
+            if (field == newValue) return
             field = newValue
             invalidate()
         }
@@ -115,6 +116,7 @@ class SwipeProgressView @JvmOverloads constructor(
             if (minProgress > newValue) {
                 minProgress = newValue
             }
+            invalidate()
         }
 
     /**
@@ -138,6 +140,7 @@ class SwipeProgressView @JvmOverloads constructor(
             if (maxProgress < newValue) {
                 maxProgress = newValue
             }
+            invalidate()
         }
 
     /**
@@ -176,6 +179,7 @@ class SwipeProgressView @JvmOverloads constructor(
      */
     var mirrorForRtl = false
         set(newValue) {
+            if (field == newValue) return
             field = newValue
             invalidate()
         }
@@ -194,6 +198,7 @@ class SwipeProgressView @JvmOverloads constructor(
      */
     var progressDrawable: Drawable = defaultDrawable
         set(newValue) {
+            if (field == newValue) return
             field = newValue
             invalidate()
         }
