@@ -186,6 +186,11 @@ class SwipeProgressView @JvmOverloads constructor(
      * Defaults to [ColorDrawable] with color read from `colorControlActivated` style attribute.
      *
      * Can also be specified using `android:progressDrawable` attribute.
+     *
+     * For convenience you can also use the [setProgressColor] function to set the progress
+     * drawable to a solid color.
+     *
+     * @see setProgressColor
      */
     var progressDrawable: Drawable = defaultDrawable
         set(newValue) {

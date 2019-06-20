@@ -36,4 +36,13 @@ class SwipeProgressViewDrawableTest : BaseSwipeProgressViewTest() {
 
         assertThat(view.progressDrawable, equalTo(drawable))
     }
+
+    @Test
+    fun `progressDrawable can be set to color drawable using setProgressColor function`() {
+        val view = buildView()
+
+        view.setProgressColor(Color.BLUE)
+
+        assertIsColorDrawableOfColor(view.progressDrawable, Color.BLUE)
+    }
 }
