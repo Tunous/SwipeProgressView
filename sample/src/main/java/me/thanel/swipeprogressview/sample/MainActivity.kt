@@ -17,5 +17,8 @@ class MainActivity : AppCompatActivity() {
         recyclerViewButton.setOnClickListener {
             startActivity(Intent(this, RecyclerViewTestActivity::class.java))
         }
+        containerButton.setOnClickListener {
+            startActivity(Intent(this, ContainerTestActivity::class.java))
+        }
     }
 }

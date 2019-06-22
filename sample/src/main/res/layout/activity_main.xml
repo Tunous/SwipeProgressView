@@ -18,4 +18,10 @@
         android:layout_height="wrap_content"
         android:text="@string/screen_recycler_view" />
 
+    <Button
+        android:id="@+id/containerButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/screen_container_view" />
+
 </LinearLayout>

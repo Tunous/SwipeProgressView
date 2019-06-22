@@ -3,4 +3,5 @@
     <string name="action_click_me">Click me</string>
     <string name="screen_basic">Basic</string>
     <string name="screen_recycler_view">Recycler View</string>
+    <string name="screen_container_view">Container</string>
 </resources>

@@ -77,8 +77,6 @@ class SwipeProgressView @JvmOverloads constructor(
     private val isLayoutRtl by lazy { isLayoutRtl() }
     private val shouldMirrorView get() = mirrorForRtl && isLayoutRtl
     private var isSwiping = false
-    private var initialEventX = 0f
-    private var initialEventY = 0f
     private var currentScrollStartValue = 0
     private var currentDownEvent: MotionEvent? = null
     private val defaultDrawable by lazy {
@@ -254,7 +252,6 @@ class SwipeProgressView @JvmOverloads constructor(
             distanceX: Float,
             distanceY: Float
         ): Boolean {
-            isPressed = false
             if (!isSwiping && distanceX != 0f) {
                 isSwiping = true
             }
@@ -290,60 +287,20 @@ class SwipeProgressView @JvmOverloads constructor(
 
             return true
         }
-
-        override fun onLongPress(e: MotionEvent?) {
-            if (isLongClickable) {
-                performLongClick()
-                isPressed = false
-            } else if (isClickable) {
-                performClick()
-                isPressed = false
-            }
-        }
-
-        override fun onSingleTapUp(e: MotionEvent): Boolean {
-            if (isClickable) {
-                onShowPress(e)
-                performClick()
-                isPressed = false
-            }
-            return true
-        }
-
-        override fun onShowPress(e: MotionEvent) {
-            drawableHotspotChanged(e.x, e.y)
-            isPressed = true
-        }
     }
 
-    private val gestureDetector = GestureDetector(context, gestureListener).apply {
-        setIsLongpressEnabled(isLongClickable)
-    }
-
-    /**
-     * @suppress
-     */
-    override fun setLongClickable(longClickable: Boolean) {
-        super.setLongClickable(longClickable)
-        gestureDetector.setIsLongpressEnabled(longClickable)
-    }
+    private val gestureDetector = GestureDetector(context, gestureListener)
 
     /**
      * @suppress
      */
     override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
-        gestureDetector.onTouchEvent(ev)
-        when (ev.actionMasked) {
-            MotionEvent.ACTION_DOWN -> {
-                initialEventX = ev.x
-                initialEventY = ev.y
-                currentScrollStartValue = progress
-            }
-            MotionEvent.ACTION_MOVE -> {
-                return isSwiping
-            }
+        val result = gestureDetector.onTouchEvent(ev)
+        if (ev.action == MotionEvent.ACTION_DOWN) {
+            currentScrollStartValue = progress
+            return false
         }
-        return false
+        return result
     }
 
     /**
@@ -353,7 +310,6 @@ class SwipeProgressView @JvmOverloads constructor(
     override fun onTouchEvent(event: MotionEvent): Boolean {
         val result = gestureDetector.onTouchEvent(event)
         if (event.action == MotionEvent.ACTION_UP) {
-            isPressed = false
             if (isSwiping) {
                 val downEvent = currentDownEvent
                 if (downEvent != null) {
