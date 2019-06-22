@@ -1,6 +1,6 @@
 # SwipeProgressView
 
-![JitPack](https://img.shields.io/jitpack/v/github/Tunous/SwipeProgressView.svg?color=brightgreen) [![API](https://img.shields.io/badge/API-21%2B-blue.svg?style=flat)](https://android-arsenal.com/api?level=21)
+[![JitPack](https://img.shields.io/jitpack/v/github/Tunous/SwipeProgressView.svg?color=brightgreen)](https://jitpack.io/#Tunous/SwipeProgressView) [![API](https://img.shields.io/badge/API-21%2B-blue.svg?style=flat)](https://android-arsenal.com/api?level=21)
 
 **TODO:** CI, Android Arsenal
 
@@ -12,9 +12,34 @@ An interactive view representing generic progress that can be altered by user wi
 
 _The above sample is from my [ReadTracker] application. In this layout, [SwipeProgressView] is a container view which handles swipe gestures, draws progress background and provides listeners for other views to update correspondingly._
 
-# Quick start
+# Installation
 
-1. Define [SwipeProgressView] in layout
+**Step 1.** Add the JitPack repository to your build file 
+
+Add in your root `build.gradle` at the end of repositories:
+
+```gradle
+allprojects {
+   repositories {
+      ...
+      maven { url 'https://jitpack.io' }
+   }
+}
+```
+
+**Step 2.** Add the dependency
+
+```gradle
+dependencies {
+   implementation 'com.github.Tunous:SwipeProgressView:VERSION_HERE'
+}
+```
+
+Replace `VERSION_HERE` with version you want to use. Latest is: [![JitPack](https://img.shields.io/jitpack/v/github/Tunous/SwipeProgressView.svg?color=brightgreen)](https://jitpack.io/#Tunous/SwipeProgressView)
+
+# Usage
+
+**Step 1.** Define [SwipeProgressView] in layout
 
 ```xml
 <me.thanel.swipeprogressview.SwipeProgressView
@@ -28,7 +53,7 @@ _The above sample is from my [ReadTracker] application. In this layout, [SwipePr
     app:spv_minProgress="0" />
 ```
 
-2. Access and modify [SwipeProgressView] from code
+**Step 2.** Access and modify [SwipeProgressView] from code
 
 ```kt
 val swipeProgressView = findViewById<SwipeProgressView>(R.id.swipeProgressView)
@@ -40,7 +65,7 @@ swipeProgressView.setOnProgressChangeListener { progress ->
 }
 ```
 
-For detailed information about what is possible see [API Documentation].
+For detailed information about what is possible see [API Documentation]. Most important is documentation for the [SwipeProgressView] class.
 
 # License
 
